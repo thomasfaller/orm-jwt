@@ -1,0 +1,22 @@
+{
+    "env": "dev",
+    "app": {
+        "host": "localhost",
+        "port": 8080
+    },
+    "db": {
+        "name": "orm_jwt",
+        "host": "localhost",
+        "port": 8082,
+        "user": "root",
+        "password": "rootpassword",
+        "dialect": "mysql"
+    },
+    "jwt": {
+        "secret": "mysupersecret",
+        "expiresIn": 600000,
+        "notBefore": 60000,
+        "audience": "site-users",
+        "issuer": "thomas"
+    }
+}

@@ -1,36 +1,41 @@
+const config = require("./config.js");
 const express = require("express");
 const Sequelize = require("sequelize");
 const bodyParser = require("body-parser");
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const PORT = 8088;
-
 const app = express();
+const PORT = config.get("app.port");
 
 app.use(bodyParser.json());
-
-// *  CONFIG
-
-const dbConf = require("./config/db-config");
-const jwtConf = require("./config/jwt-config");
 
 // ******************************
 // **            DB            **
 // ******************************
 
-const sequelize = new Sequelize(dbConf.db, dbConf.user, dbConf.pwd, {
-  host: dbConf.host,
-  port: dbConf.port,
-  dialect: dbConf.dialect,
-});
+const sequelize = new Sequelize(
+  config.get("db.name"),
+  config.get("db.user"),
+  config.get("db.password"),
+  {
+    host: config.get("db.host"),
+    port: config.get("db.port"),
+    dialect: config.get("db.dialect"),
+  }
+);
 
 sequelize
   .authenticate()
   .then((data) => {
-    console.log(`Successfully connected to database: '${dbConf.db}'`);
+    console.log(
+      `Successfully connected to database: '${config.get("app.port")}'`
+    );
   })
   .catch((error) => {
-    console.log(`Could not connect to database: '${dbConf.db}'`, error);
+    console.log(
+      `Could not connect to database: '${config.get("app.port")}'`,
+      error
+    );
   });
 
 // ******************************
@@ -99,11 +104,12 @@ app.post("/login", (req, res) => {
               email: user.email,
               id: user.id,
             },
-            jwtConf.secret,
+            config.get("jwt.secret"),
             {
-              expiresIn: jwtConf.expiresIn,
-              notBefore: jwtConf.notBefore,
-              audience: jwtConf.audience,
+              expiresIn: config.get("jwt.expiresIn"),
+              notBefore: config.get("jwt.notBefore"),
+              audience: config.get("jwt.audience"),
+              issuer: config.get("jwt.issuer"),
             }
           );
 
