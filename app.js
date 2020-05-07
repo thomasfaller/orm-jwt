@@ -21,6 +21,7 @@ const sequelize = new Sequelize(
     host: config.get("db.host"),
     port: config.get("db.port"),
     dialect: config.get("db.dialect"),
+    logging: config.get("db.logging") ? console.log : false,
   }
 );
 
@@ -28,12 +29,16 @@ sequelize
   .authenticate()
   .then((data) => {
     console.log(
-      `Successfully connected to database: '${config.get("app.port")}'`
+      `Successfully connected to ${config.get("env")} database: '${config.get(
+        "db.name"
+      )}'`
     );
   })
   .catch((error) => {
     console.log(
-      `Could not connect to database: '${config.get("app.port")}'`,
+      `Could not connect to ${config.get("env")} database: '${config.get(
+        "db.name"
+      )}'`,
       error
     );
   });
@@ -86,6 +91,34 @@ const User = sequelize.define(
 
 User.sync();
 
+// Validate Token
+app.post("/validate", (req, res) => {
+  const token = req.headers.authorization;
+  if (token) {
+    // console.log(token);
+    JWT.verify(token, config.get("jwt.secret"), (error, decoded) => {
+      if (error) {
+        res.status(401).json({
+          status: 0,
+          message: "Invalid Authentification Token.",
+          data: error,
+        });
+      } else {
+        res.status(200).json({
+          status: 1,
+          message: "Authentification Token is valid.",
+          data: decoded,
+        });
+      }
+    });
+  } else {
+    res.status(401).json({
+      status: 0,
+      message: "Please provide an authentification Token.",
+    });
+  }
+});
+
 // Login a User
 app.post("/login", (req, res) => {
   const email = req.body.email;
@@ -110,6 +143,7 @@ app.post("/login", (req, res) => {
               notBefore: config.get("jwt.notBefore"),
               audience: config.get("jwt.audience"),
               issuer: config.get("jwt.issuer"),
+              algorithm: config.get("jwt.algorithm"),
             }
           );
 

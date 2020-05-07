@@ -6,6 +6,7 @@ const config = convict({
     doc: "the application environment.",
     format: ["prod", "dev", "test"],
     default: "dev",
+    arg: "env",
     env: "NODE_ENV",
   },
   app: {
@@ -56,6 +57,11 @@ const config = convict({
       format: ["mysql", "mariadb", "sqlite", "postgres", "mssql"],
       default: "mysql",
     },
+    logging: {
+      doc: "Activate Sequelize logs in the console.",
+      format: Boolean,
+      default: true,
+    },
   },
   jwt: {
     secret: {
@@ -64,12 +70,12 @@ const config = convict({
       sensitive: true,
     },
     expiresIn: {
-      format: Number,
-      default: 600000,
+      format: String,
+      default: "1m",
     },
     notBefore: {
-      format: Number,
-      default: 60000,
+      format: String,
+      default: "10s",
     },
     audience: {
       format: String,
@@ -78,6 +84,10 @@ const config = convict({
     issuer: {
       format: String,
       default: "thomas",
+    },
+    algorithm: {
+      format: ["HS256", "HS384", "HS512"],
+      default: "HS256",
     },
   },
 });
