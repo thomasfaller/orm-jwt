@@ -9,18 +9,14 @@ const app = express();
 
 app.use(bodyParser.json());
 
+// *  CONFIG
+
+const dbConf = require("./config/db-config");
+const jwtConf = require("./config/jwt-config");
+
 // ******************************
 // **            DB            **
 // ******************************
-
-const dbConf = {
-  db: "orm_jwt",
-  user: "root",
-  pwd: "rootpassword",
-  host: "localhost",
-  port: 8082,
-  dialect: "mysql",
-};
 
 const sequelize = new Sequelize(dbConf.db, dbConf.user, dbConf.pwd, {
   host: dbConf.host,
@@ -103,11 +99,11 @@ app.post("/login", (req, res) => {
               email: user.email,
               id: user.id,
             },
-            "mysupersecret",
+            jwtConf.secret,
             {
-              expiresIn: 600000, // expires in 10 minutes
-              notBefore: 60000, // we can use the token only after 1 minute
-              audience: "site-users",
+              expiresIn: jwtConf.expiresIn,
+              notBefore: jwtConf.notBefore,
+              audience: jwtConf.audience,
             }
           );
 
